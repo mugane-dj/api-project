@@ -11,8 +11,7 @@ import youtube_dl
 class Playlist:
     def __init__(self):
         self.youtube_client = self.get_youtube_client
-
-
+        
     def get_youtube_client(self):
         os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
         api_service_name = "youtube"
