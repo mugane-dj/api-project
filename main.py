@@ -7,9 +7,11 @@ import googleapiclient.discovery
 import googleapiclient.errors
 import youtube_dl
 
-from secrets import spotify_token, spotify_user_id
+from secrets import spotify_user_id
+from refreshtoken import Refresh_token
 class Playlist:
     def __init__(self):
+        self.spotify_token = ""
         self.youtube_client = self.get_youtube_client()
         self.all_song_info = {}
 
@@ -25,6 +27,7 @@ class Playlist:
         youtube_client = googleapiclient.discovery.build(
             api_service_name, api_version, credentials=credentials)
         return youtube_client
+        
 
     def get_playlist_items(self):
         request = self.youtube_client.playlistItems().list(
@@ -63,7 +66,7 @@ class Playlist:
             data=request_body,
             headers={
                 "Content-Type": "application/json",
-                "Authorization": "Bearer {}".format(spotify_token)
+                "Authorization": "Bearer {}".format(self.spotify_token)
             }
         )
         response_json = response.json()
@@ -78,7 +81,7 @@ class Playlist:
             query,
             headers={
                 "Content-Type": "application/json",
-                "Authorization": "Bearer {}".format(spotify_token)
+                "Authorization": "Bearer {}".format(self.spotify_token)
             }
         )
         response_json = response.json()
@@ -101,9 +104,13 @@ class Playlist:
             data=request_data,
             headers={
                 "Content-Type": "application/json",
-                "Authorization": "Bearer {}".format(spotify_token)
+                "Authorization": "Bearer {}".format(self.spotify_token)
             }
         )
+    def refresh(self):
+        refreshCaller = refresh()
+        self.spotify_token = refreshCaller.refresh()
+
 if __name__ == '__main__':
     a = Playlist()
     a.add_songs_to_spotify_playlist()
