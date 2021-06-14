@@ -7,13 +7,14 @@ import googleapiclient.discovery
 import googleapiclient.errors
 import youtube_dl
 
-from secrets import spotify_user_id
-from refreshtoken import Refresh_token
+from secrets import spotify_user_id, youtube_playlist_id
+from refresh import Refresh_token
 class Playlist:
     def __init__(self):
         self.spotify_token = ""
         self.youtube_client = self.get_youtube_client()
-        self.all_song_info = {}
+        self.song_info = ""
+        self.youtube_playlist_id  = youtube_playlist_id 
 
     def get_youtube_client(self):
         os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -27,30 +28,30 @@ class Playlist:
         youtube_client = googleapiclient.discovery.build(
             api_service_name, api_version, credentials=credentials)
         return youtube_client
-        
 
     def get_playlist_items(self):
         request = self.youtube_client.playlistItems().list(
             part="snippet",
-            playlistId="PLd2G12g_chuQ2T7Lzu9ZHoLLOA4T9hdGL"
+            playlistId=self.youtube_playlist_id 
         )
         reponse = request.execute()
 
-        for items in reponse["items"]:
-            video_title = item["snippets"]["title"]
+        for i in reponse["items"]:
+            video_title = i["snippets"]["title"]
             youtube_url = "https://www.youtube.com/watch?v={}".format(
-                item["id"])
+                i["id"])
             video = youtube_dl.YoutubeDL({}).extract_info(
                 youtube_url, download=False)
             song_name = video["track"]
             artist = video["artist"]
         if song_name is not None and artist is not None:
-            self.all_song_info[video_title] = {
+            self.song_info[video_title] = {
                 "youtube_url": youtube_url,
                 "song_name": song_name,
                 "artist": artist,
                 "spotify_uri": self.get_spotify_uri(song_name, artist)
             }
+        self.get_youtube_client()
     def create_playlist(self):
         """Create A Playlist in Spotify"""
         request_body = json.dumps({
@@ -85,20 +86,18 @@ class Playlist:
             }
         )
         response_json = response.json()
-        songs = response_json["tracks"]["items"]
-        uri = songs[0]["uri"]
-        return uri
+        for i in response_json["items"]:
+            self.song_info += (i["track"]["uri"], ",")
+        self.song_info = self.song_info[:-1]
     
     def add_songs_to_spotify_playlist(self):
         self.get_playlist_items()
-        uris = [info["spotify_uri"]
-                for song, info in self.all_song_info.items()]
+        uris = self.song_info
         playlist_id = self.create_playlist()
         request_data = json.dumps(uris)
 
         query = "https://api.spotify.com/v1/playlists/{}/tracks".format(
             playlist_id)
-
         response = requests.post(
             query,
             data=request_data,
@@ -108,7 +107,7 @@ class Playlist:
             }
         )
     def refresh(self):
-        refreshCaller = refresh()
+        refreshCaller = Refresh_token()
         self.spotify_token = refreshCaller.refresh()
 
 if __name__ == '__main__':
