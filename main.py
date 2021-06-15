@@ -17,10 +17,11 @@ class Playlist:
         self.youtube_playlist_id  = youtube_playlist_id 
 
     def get_youtube_client(self):
+        print("Fetching client...")
         os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
         api_service_name = "youtube"
         api_version = "v3"
-        client_secret = "client.json"
+        client_secret = "youtube.json"
         scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
         flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
             client_secret, scopes)
@@ -35,7 +36,7 @@ class Playlist:
             playlistId=self.youtube_playlist_id 
         )
         reponse = request.execute()
-
+        print("Looping through playlist...")
         for i in reponse["items"]:
             video_title = i["snippets"]["title"]
             youtube_url = "https://www.youtube.com/watch?v={}".format(
@@ -91,6 +92,7 @@ class Playlist:
         self.song_info = self.song_info[:-1]
     
     def add_songs_to_spotify_playlist(self):
+        print("Finalizing...")
         self.get_playlist_items()
         uris = self.song_info
         playlist_id = self.create_playlist()
@@ -112,6 +114,6 @@ class Playlist:
 
 if __name__ == '__main__':
     a = Playlist()
-    a.add_songs_to_spotify_playlist()
+    a.get_youtube_client()
 
 
