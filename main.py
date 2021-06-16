@@ -39,11 +39,11 @@ class Playlist:
         reponse = request.execute()
         print("Looping through playlist...")
         for i in reponse["items"]:
-            video_title = i["snippets"]["title"]
+            video_title = i["snippet"]["title"]
             youtube_url = "https://www.youtube.com/watch?v={}".format(
-                i['id'])
+                i["id"])
             video = youtube_dl.YoutubeDL({}).extract_info(
-                youtube_url, download=False)
+                youtube_url, download=False,)
             song_name = video["track"]
             artist = video["artist"]
         if song_name is not None and artist is not None:
