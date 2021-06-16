@@ -13,7 +13,6 @@ from refresh import Refresh_token
 class Playlist:
     def __init__(self):
         self.spotify_token = ""
-        self.youtube_client = ""
         self.song_info = ""
         self.youtube_playlist_id  = youtube_playlist_id 
     
@@ -29,23 +28,24 @@ class Playlist:
         credentials = flow.run_local_server(port=8080, prompt="consent")
         youtube_client = googleapiclient.discovery.build(
             api_service_name, api_version, credentials=credentials)
-        self.youtube_client = youtube_client
+        return youtube_client
 
     def get_playlist_items(self):
-        request = self.youtube_client.playlistItems().list(
+        youtube_client = self.get_youtube_client()
+        request = youtube_client.playlistItems().list(
             part="snippet",
             playlistId=self.youtube_playlist_id 
         )
         reponse = request.execute()
         print("Looping through playlist...")
-        for i in reponse['items']:
-            video_title = i['snippets']['title']
+        for i in reponse["items"]:
+            video_title = i["snippets"]["title"]
             youtube_url = "https://www.youtube.com/watch?v={}".format(
                 i['id'])
             video = youtube_dl.YoutubeDL({}).extract_info(
                 youtube_url, download=False)
-            song_name = video['track']
-            artist = video['artist']
+            song_name = video["track"]
+            artist = video["artist"]
         if song_name is not None and artist is not None:
             self.song_info[video_title] = {
                 "youtube_url": youtube_url,
