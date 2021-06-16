@@ -1,3 +1,4 @@
+#pylint: disable=E1101
 import os
 import json
 import requests
@@ -12,10 +13,10 @@ from refresh import Refresh_token
 class Playlist:
     def __init__(self):
         self.spotify_token = ""
-        self.youtube_client = self.get_youtube_client()
+        self.youtube_client = ""
         self.song_info = ""
         self.youtube_playlist_id  = youtube_playlist_id 
-
+    
     def get_youtube_client(self):
         print("Fetching client...")
         os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -28,7 +29,7 @@ class Playlist:
         credentials = flow.run_local_server(port=8080, prompt="consent")
         youtube_client = googleapiclient.discovery.build(
             api_service_name, api_version, credentials=credentials)
-        return youtube_client
+        self.youtube_client = youtube_client
 
     def get_playlist_items(self):
         request = self.youtube_client.playlistItems().list(
@@ -37,14 +38,14 @@ class Playlist:
         )
         reponse = request.execute()
         print("Looping through playlist...")
-        for i in reponse["items"]:
-            video_title = i["snippets"]["title"]
+        for i in reponse['items']:
+            video_title = i['snippets']['title']
             youtube_url = "https://www.youtube.com/watch?v={}".format(
-                i["id"])
+                i['id'])
             video = youtube_dl.YoutubeDL({}).extract_info(
                 youtube_url, download=False)
-            song_name = video["track"]
-            artist = video["artist"]
+            song_name = video['track']
+            artist = video['artist']
         if song_name is not None and artist is not None:
             self.song_info[video_title] = {
                 "youtube_url": youtube_url,
@@ -89,8 +90,8 @@ class Playlist:
             }
         )
         response_json = response.json()
-        for i in response_json["items"]:
-            self.song_info += (i["track"]["uri"], ",")
+        for i in response_json['items']:
+            self.song_info += (i['track']['uri'], ',')
         self.song_info = self.song_info[:-1]
     
     def add_songs_to_spotify_playlist(self):
@@ -117,6 +118,6 @@ class Playlist:
 
 if __name__ == '__main__':
     a = Playlist()
-    a.create_playlist()
+    a.add_songs_to_spotify_playlist()
 
 
