@@ -52,9 +52,11 @@ class Playlist:
                 "artist": artist,
                 "spotify_uri": self.get_spotify_uri(song_name, artist)
             }
-        self.get_youtube_client()
+
     def create_playlist(self):
         """Create A Playlist in Spotify"""
+        self.refresh()
+        print("Creating spotify playlist")
         request_body = json.dumps({
             "name": "GRM DAILY",
             "description": "All songs in GRM daily youtube playlist",
@@ -72,7 +74,7 @@ class Playlist:
             }
         )
         response_json = response.json()
-        return response_json["id"]
+        return response_json['id']
 
     def get_spotify_uri(self, song_name, artist):
         query = "https://api.spotify.com/v1/search?query=track%3A{}+artist%3A{}&type=track&offset=0&limit=20".format(
@@ -108,12 +110,13 @@ class Playlist:
                 "Authorization": "Bearer {}".format(self.spotify_token)
             }
         )
+        return response
     def refresh(self):
         refreshCaller = Refresh_token()
         self.spotify_token = refreshCaller.refresh()
 
 if __name__ == '__main__':
     a = Playlist()
-    a.get_youtube_client()
+    a.create_playlist()
 
 
