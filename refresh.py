@@ -19,7 +19,7 @@ class Refresh_token:
             headers={
                     "Authorization": "Basic " + base_64})
         response_json = response.json()
-        print(response_json['access_token'])
+        return response_json['access_token']
 
 
 if __name__=='__main__':
