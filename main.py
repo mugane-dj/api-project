@@ -14,8 +14,8 @@ class Playlist:
     def __init__(self):
         self.spotify_token = ""
         self.song_info = ""
-        self.youtube_playlist_id  = youtube_playlist_id 
-    
+        self.youtube_playlist_id = youtube_playlist_id
+
     def get_youtube_client(self):
         print("Fetching client...")
         os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -34,18 +34,19 @@ class Playlist:
         youtube_client = self.get_youtube_client()
         request = youtube_client.playlistItems().list(
             part="snippet",
-            playlistId=self.youtube_playlist_id 
+            playlistId=self.youtube_playlist_id
         )
-        reponse = request.execute()
+        response = request.execute()
         print("Looping through playlist...")
-        for i in reponse["items"]:
-            video_title = i["snippet"]["title"]
-            youtube_url = "https://www.youtube.com/watch?v={}".format(
-                i["id"])
+        for r in response["items"]:
+            video_Id = r["snippet"]["resourceId"]["videoId"]
+            youtube_url = "https://www.youtube.com/watch?v={}".format(video_Id)
             video = youtube_dl.YoutubeDL({}).extract_info(
-                youtube_url, download=False,)
-            song_name = video["track"]
-            artist = video["artist"]
+                youtube_url, download=False, force_generic_extractor=True)
+            song_name = video["title"]
+            artist = video["title"]
+        for i in response["items"]:
+            video_title = i["snippet"]["title"]
         if song_name is not None and artist is not None:
             self.song_info[video_title] = {
                 "youtube_url": youtube_url,
@@ -78,6 +79,7 @@ class Playlist:
         return response_json['id']
 
     def get_spotify_uri(self, song_name, artist):
+        self.refresh()
         query = "https://api.spotify.com/v1/search?query=track%3A{}+artist%3A{}&type=track&offset=0&limit=20".format(
             song_name,
             artist
@@ -90,10 +92,11 @@ class Playlist:
             }
         )
         response_json = response.json()
-        for i in response_json['items']:
+        print(response_json)
+        for i in response_json["items"]:
             self.song_info += (i['track']['uri'], ',')
         self.song_info = self.song_info[:-1]
-    
+
     def add_songs_to_spotify_playlist(self):
         print("Finalizing...")
         self.get_playlist_items()
@@ -112,12 +115,12 @@ class Playlist:
             }
         )
         return response
+
     def refresh(self):
         refreshCaller = Refresh_token()
         self.spotify_token = refreshCaller.refresh()
 
+
 if __name__ == '__main__':
     a = Playlist()
     a.add_songs_to_spotify_playlist()
-
-
