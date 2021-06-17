@@ -43,8 +43,10 @@ class Playlist:
             youtube_url = "https://www.youtube.com/watch?v={}".format(video_Id)
             video = youtube_dl.YoutubeDL({}).extract_info(
                 youtube_url, download=False, force_generic_extractor=True)
-            song_name = video["title"]
-            artist = video["title"]
+            song_name = video["track"]
+            print(song_name)
+            artist = video["artist"]
+            print(artist)
         for i in response["items"]:
             video_title = i["snippet"]["title"]
         if song_name is not None and artist is not None:
@@ -58,13 +60,12 @@ class Playlist:
     def create_playlist(self):
         """Create A Playlist in Spotify"""
         self.refresh()
-        print("Creating spotify playlist")
         request_body = json.dumps({
             "name": "GRM DAILY",
             "description": "All songs in GRM daily youtube playlist",
             "public": False
         })
-
+        print("Creating spotify playlist")
         query = "https://api.spotify.com/v1/users/{}/playlists".format(
             spotify_user_id)
         response = requests.post(
@@ -98,7 +99,6 @@ class Playlist:
         self.song_info = self.song_info[:-1]
 
     def add_songs_to_spotify_playlist(self):
-        print("Finalizing...")
         self.get_playlist_items()
         uris = self.song_info
         playlist_id = self.create_playlist()
@@ -106,6 +106,7 @@ class Playlist:
 
         query = "https://api.spotify.com/v1/playlists/{}/tracks".format(
             playlist_id)
+        print("Finalizing...")
         response = requests.post(
             query,
             data=request_data,
