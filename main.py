@@ -1,5 +1,6 @@
 #pylint: disable=E1101
 import os
+import re
 import json
 import requests
 
@@ -28,13 +29,16 @@ class Playlist:
         credentials = flow.run_local_server(port=8080, prompt="consent")
         youtube_client = googleapiclient.discovery.build(
             api_service_name, api_version, credentials=credentials)
+        print("client fetching successful!")
         return youtube_client
 
     def get_playlist_items(self):
         youtube_client = self.get_youtube_client()
         request = youtube_client.playlistItems().list(
             part="snippet",
-            playlistId=self.youtube_playlist_id
+            playlistId=self.youtube_playlist_id,
+            maxResults=50,
+            myRating="like"
         )
         response = request.execute()
         print("Looping through playlist...")
@@ -43,10 +47,12 @@ class Playlist:
             youtube_url = "https://www.youtube.com/watch?v={}".format(video_Id)
             video = youtube_dl.YoutubeDL({}).extract_info(
                 youtube_url, download=False, force_generic_extractor=True)
-            song_name = video["track"]
-            print(song_name)
-            artist = video["artist"]
+            creator = video["title"]
+            artist = creator.split("-")[0]   
             print(artist)
+            track = video["title"]
+            song_name = track.split("-")[1].split("[Music Video] | GRM Daily")[0] 
+            print(song_name) 
         for i in response["items"]:
             video_title = i["snippet"]["title"]
         if song_name is not None and artist is not None:
@@ -93,8 +99,8 @@ class Playlist:
             }
         )
         response_json = response.json()
-        print(response_json)
-        for i in response_json["items"]:
+        print(response_json['items'])
+        for i in response_json['items']:
             self.song_info += (i['track']['uri'], ',')
         self.song_info = self.song_info[:-1]
 
