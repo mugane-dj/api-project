@@ -39,9 +39,10 @@ class Playlist:
             maxResults=30
         )
         response = request.execute()
+        print(response)
         print("Looping through playlist...")
-        for r in response["items"]:
-            video_Id = r["snippet"]["resourceId"]["videoId"]
+        for item in response["items"]:
+            video_Id = item["snippet"]["resourceId"]["videoId"]
             youtube_url = "https://www.youtube.com/watch?v={}".format(video_Id)
             video = youtube_dl.YoutubeDL({}).extract_info(
                 youtube_url, download=False, force_generic_extractor=True, process=True)
@@ -51,8 +52,8 @@ class Playlist:
             track = video["title"]
             song_name = track.split("-")[1].split("| A COLORS SHOW")[0]
             print(song_name) 
-        for i in response["items"]:
-            video_title = i["snippet"]["title"]
+        for item in response["items"]:
+            video_title = item["snippet"]["title"]
         if song_name is not None and artist is not None:
             self.song_info[video_title] = {
                 "youtube_url": youtube_url,
@@ -60,6 +61,7 @@ class Playlist:
                 "artist": artist,
                 "spotify_uri": self.get_spotify_uri(song_name, artist)
             }
+        return song_name,artist,video_title
 
     def create_playlist(self):
         """Create A Playlist in Spotify"""
