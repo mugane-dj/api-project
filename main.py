@@ -36,7 +36,7 @@ class Playlist:
         request = youtube_client.playlistItems().list(
             part="snippet",
             playlistId=self.youtube_playlist_id,
-            maxResults=30
+            #maxResults=30
         )
         response = request.execute()
         print(response)
@@ -45,7 +45,7 @@ class Playlist:
             video_Id = item["snippet"]["resourceId"]["videoId"]
             youtube_url = "https://www.youtube.com/watch?v={}".format(video_Id)
             video = youtube_dl.YoutubeDL({}).extract_info(
-                youtube_url, download=False, force_generic_extractor=True, process=True)
+                youtube_url, download=False, force_generic_extractor=True)
             creator = video["title"]
             artist = creator.split("-")[0]   
             print(artist)
@@ -61,7 +61,7 @@ class Playlist:
                 "artist": artist,
                 "spotify_uri": self.get_spotify_uri(song_name, artist)
             }
-        return song_name,artist,video_title
+        print(self.song_info)
 
     def create_playlist(self):
         """Create A Playlist in Spotify"""
@@ -96,14 +96,12 @@ class Playlist:
             headers={
                 "Content-Type": "application/json",
                 "Authorization": "Bearer {}".format(self.spotify_token)
-            }
-        )
+            })
         response_json = response.json()
         print(response_json["tracks"])
         songs = response_json["tracks"]["items"]
         uri = songs[0]["uri"]
         return uri 
-
     def add_songs_to_spotify_playlist(self):
         self.get_playlist_items()
         uris = [info["spotify_uri"]for song, info in self.song_info.items()]
