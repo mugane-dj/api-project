@@ -1,6 +1,5 @@
 #pylint: disable=E1101
 import os
-import re
 import json
 import requests
 
@@ -14,7 +13,7 @@ from refresh import Refresh_token
 class Playlist:
     def __init__(self):
         self.spotify_token = ""
-        self.song_info = ""
+        self.song_info = {}
         self.youtube_playlist_id = youtube_playlist_id
 
     def get_youtube_client(self):
@@ -37,8 +36,7 @@ class Playlist:
         request = youtube_client.playlistItems().list(
             part="snippet",
             playlistId=self.youtube_playlist_id,
-            maxResults=50,
-            myRating="like"
+            maxResults=30
         )
         response = request.execute()
         print("Looping through playlist...")
@@ -46,12 +44,12 @@ class Playlist:
             video_Id = r["snippet"]["resourceId"]["videoId"]
             youtube_url = "https://www.youtube.com/watch?v={}".format(video_Id)
             video = youtube_dl.YoutubeDL({}).extract_info(
-                youtube_url, download=False, force_generic_extractor=True)
+                youtube_url, download=False, force_generic_extractor=True, process=True)
             creator = video["title"]
             artist = creator.split("-")[0]   
             print(artist)
             track = video["title"]
-            song_name = track.split("-")[1].split("[Music Video] | GRM Daily")[0] 
+            song_name = track.split("-")[1].split("| A COLORS SHOW")[0]
             print(song_name) 
         for i in response["items"]:
             video_title = i["snippet"]["title"]
@@ -67,8 +65,8 @@ class Playlist:
         """Create A Playlist in Spotify"""
         self.refresh()
         request_body = json.dumps({
-            "name": "GRM DAILY",
-            "description": "All songs in GRM daily youtube playlist",
+            "name": "Living Color",
+            "description": "All songs in colors youtube playlist",
             "public": False
         })
         print("Creating spotify playlist")
@@ -99,14 +97,14 @@ class Playlist:
             }
         )
         response_json = response.json()
-        print(response_json['items'])
-        for i in response_json['items']:
-            self.song_info += (i['track']['uri'], ',')
-        self.song_info = self.song_info[:-1]
+        print(response_json["tracks"])
+        songs = response_json["tracks"]["items"]
+        uri = songs[0]["uri"]
+        return uri 
 
     def add_songs_to_spotify_playlist(self):
         self.get_playlist_items()
-        uris = self.song_info
+        uris = [info["spotify_uri"]for song, info in self.song_info.items()]
         playlist_id = self.create_playlist()
         request_data = json.dumps(uris)
 
@@ -121,7 +119,7 @@ class Playlist:
                 "Authorization": "Bearer {}".format(self.spotify_token)
             }
         )
-        return response
+        print(response)
 
     def refresh(self):
         refreshCaller = Refresh_token()
