@@ -1,2 +1,7 @@
 spotify_user_id = ""
 spotify_token = ""
+client_id = ""
+client_secret = ""
+base_64 = ""
+refresh_token = ""
+youtube_playlist_id = ""
