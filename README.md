@@ -34,3 +34,6 @@ After finishing my python fundamentals course, I decided to create my first proj
 
 ![](https://github.com/roguecode25/api-project/blob/fa5b5f0d956b7293b04caead56cc8f1d42255308/snapshots/terminal2.png) 
 **Figure 4 - Output**
+
+### To Do
+1. Add more code functionality i.e fetching more songs
