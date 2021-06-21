@@ -9,8 +9,8 @@ After finishing my python fundamentals course, I decided to create my first proj
 <hr />
 
 ### Running the script
-1. Gather credentials from youtube api [Link]().
-2. Gather credentials from spotify api [Link]().
+1. Gather credentials from youtube api [Link](https://console.cloud.google.com/apis).
+2. Gather credentials from spotify api [Link](https://developer.spotify.com/dashboard/).
 3. Fill all fields in secrets file. The playlist Id is extracted as shown below;
 ![](https://github.com/roguecode25/api-project/blob/fa5b5f0d956b7293b04caead56cc8f1d42255308/snapshots/playlistid.png) 
 **Figure 1 - Playlist Id**
