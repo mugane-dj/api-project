@@ -30,7 +30,7 @@ class Playlist:
         youtube_client = googleapiclient.discovery.build(
             api_service_name, api_version, credentials=credentials)
 
-        print("client fetching successful!")
+        print(f"client fetching successful{youtube_client}!")
 
         return youtube_client
 
