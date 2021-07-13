@@ -2,6 +2,7 @@
 import os
 import json
 import requests
+from pydash import py_
 
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -48,7 +49,7 @@ class Playlist:
 
         for item in response["items"]:
             video_title = item["snippet"]["title"]
-            video_Id = item["snippet"]["resourceId"]["videoId"]
+            video_Id = py_.get(item, "snippet.resourceId.videoId")
             youtube_url = "https://www.youtube.com/watch?v={}".format(video_Id)
             video = youtube_dl.YoutubeDL({}).extract_info(
                 youtube_url, download=False, force_generic_extractor=True)
