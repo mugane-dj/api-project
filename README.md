@@ -11,13 +11,13 @@ After finishing my python fundamentals course, I decided to create my first proj
 ### Running the script
 1. Gather credentials from youtube api [Link](https://console.cloud.google.com/apis).
 2. Gather credentials from spotify api [Link](https://developer.spotify.com/dashboard/).
-3. Fill all fields in secrets file. The playlist Id is extracted as shown below;
+3. Fill in your spotify user id, spotify token, refresh token, base 64 string of client id and client secret accessed through Spotify's API and the youtube playliust id in a .env file. The playlist id is extracted as shown below;
 ![](https://github.com/roguecode25/api-project/blob/fa5b5f0d956b7293b04caead56cc8f1d42255308/snapshots/playlistid.png) 
 **Figure 1 - Playlist Id**
     
     The highlighted object is the playlist Id.
 4. Install requirements
-    `python -m install -r requirements.txt`
+    `pip install -r requirements.txt`
 5. Run script
     `python main.py`
 
@@ -34,6 +34,3 @@ After finishing my python fundamentals course, I decided to create my first proj
 
 ![](https://github.com/roguecode25/api-project/blob/fa5b5f0d956b7293b04caead56cc8f1d42255308/snapshots/terminal2.png) 
 **Figure 4 - Output**
-
-### To Do
-1. Add more code functionality i.e fetching more songs
